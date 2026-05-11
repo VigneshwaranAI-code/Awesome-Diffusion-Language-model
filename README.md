@@ -1,1 +1,1 @@
-# Awesome-Diffusion-Language-model-
+# Awesome-Diffusion-Language-model
