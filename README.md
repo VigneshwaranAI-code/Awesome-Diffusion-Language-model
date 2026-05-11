@@ -28,7 +28,7 @@
 
 ---
 
-```markdown
+
 ## 🎥 Visual Walkthrough
 
 <p align="center">
@@ -40,7 +40,7 @@
 <p align="center">
   <i>Click the preview above to watch the full repository walkthrough.</i>
 </p>
-```
+
 
 
 
