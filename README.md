@@ -28,10 +28,20 @@
 
 ---
 
+```markdown
+## 🎥 Visual Walkthrough
+
 <p align="center">
-  <a href="md_src/Screen Recording 2026-05-12 022805.mp4">
+  <a href="./md_src/Screen Recording 2026-05-12 022805.mp4">
+    <img src="./assets/demo-preview.gif" width="900" alt="Watch the walkthrough"/>
   </a>
 </p>
+
+<p align="center">
+  <i>Click the preview above to watch the full repository walkthrough.</i>
+</p>
+```
+
 
 
 ## 📌 Table of Contents
