@@ -40,6 +40,13 @@
 - [📊 Interactive Visualizations](#-interactive-visualizations)
 - [⚔️ DLM vs. Autoregressive LLMs](#️-dlm-vs-autoregressive-llms)
 - [📚 Curated Paper List](#-curated-paper-list)
+- [🗞️ Recent Research Papers (May 2025 → Present)](#️-recent-research-papers-may-2025--present)
+  - [🔥 Landmark Releases](#-landmark-releases)
+  - [⚡ Inference Efficiency](#-inference-efficiency)
+  - [🧠 Reasoning & RL Alignment](#-reasoning--rl-alignment)
+  - [📐 Theory & Scaling Laws](#-theory--scaling-laws)
+  - [🌍 Multimodal & Domain-Specific](#-multimodal--domain-specific)
+  - [📋 Surveys & Overviews](#-surveys--overviews-2025)
 - [💻 Implementation Guides](#-implementation-guides)
 - [🏋️ Training From Scratch](#️-training-from-scratch)
 - [🔨 Build a DLM from Scratch](#-build-a-dlm-from-scratch)
@@ -366,6 +373,190 @@ Papers organized by topic with difficulty ratings and visual summaries.
 |---|---|
 | [A Survey of Diffusion Models in Natural Language Processing](https://arxiv.org/abs/2305.14671) | Comprehensive NLP coverage |
 | [Diffusion Models for Non-autoregressive Text Generation: A Survey](https://arxiv.org/abs/2305.12972) | NAR-focused comparison |
+
+---
+
+---
+
+## 🗞️ Recent Research Papers (May 2025 → Present)
+
+> **Live tracker.** This section follows the DLM research frontier from **May 26, 2025** onward — the moment the field shifted from "interesting experiments" to "production-scale competition with autoregressive LLMs."
+>
+> Papers are sorted chronologically within each theme. 🔥 = high impact · ⭐ = recommended first read · 🆕 = very recent
+
+---
+
+### 🔥 Landmark Releases
+
+These are the headline papers that reshaped the field and attracted the most community attention.
+
+| Date | Paper | Authors | TL;DR | Links |
+|---|---|---|---|---|
+| **May 20, 2025** 🆕 | **Gemini Diffusion** | Google DeepMind | First commercial-grade text diffusion model; generates **1,479 tokens/sec** — 5× faster than Gemini 2.0 Flash Lite; error-corrects during generation | [Blog](https://deepmind.google/models/gemini-diffusion/) |
+| **May 24, 2025** ⭐ | **Anchored Diffusion Language Model** | Rout, Caramanis, Shakkottai | Identifies that masking *important* anchor tokens early is the root cause of DLM quality gaps; anchored masking closes the gap with AR models on perplexity and generation quality | [arxiv:2505.18456](https://arxiv.org/abs/2505.18456) |
+| **Jun 17, 2025** 🔥 | **Mercury: Ultra-Fast LLMs Based on Diffusion** | Inception Labs | First commercial diffusion LLMs for coding (Mercury Coder Mini/Small); achieves **new state-of-the-art on the speed-quality frontier** for code generation; parallel token prediction via Transformer | [arxiv:2506.17298](https://arxiv.org/abs/2506.17298) |
+| **Aug 2025** 🔥⭐ | **Dream 7B: Diffusion Large Language Models** | Ye et al. | Adapts Qwen-2.5 (7B) into a masked diffusion LM via context-adaptive noise rescheduling; achieves competitive performance with LLaMA-3 8B across reasoning, math, and code | [arxiv:2508.15487](https://arxiv.org/abs/2508.15487) |
+| **Nov 5, 2025** 🔥 | **Diffusion LMs are Super Data Learners** | Ni, Liu et al. (NUS) | Landmark empirical study (up to 8B params, 1.5T tokens): DLMs **consistently surpass AR models** when training data is limited; crossover point shifts with data quality and model scale | [arxiv:2511.03276](https://arxiv.org/abs/2511.03276) |
+| **Dec 2025** 🔥 | **LLaDA 2.0: Scaling DLMs to 100B** | Bie et al. (Ant Group / Renmin U.) | Converts pretrained AR models into dLLMs via a 3-phase block-level WSD training scheme; releases 16B (mini) and **100B (flash)** instruction-tuned variants with parallel decoding intact | [arxiv:2512.15745](https://arxiv.org/abs/2512.15745) |
+| **Feb 2026** ⭐ | **dLLM: Simple Diffusion Language Modeling** | Chandrasegaran et al. | Systematic review and simplification of the dLLM design space; distils best practices for architecture, training, and sampling into a clean, reproducible recipe | [arxiv:2602.22661](https://arxiv.org/abs/2602.22661) |
+| **May 2026** 🆕 | **Focus on the Core: Self-Contrast for dLLMs** | Ma et al. | Identifies locally-biased decoding as a bottleneck; proposes Self-Contrast decoding to prioritize core reasoning tokens globally, improving math and logic benchmarks | [arxiv:2605.01373](https://arxiv.org/abs/2605.01373) |
+
+---
+
+### ⚡ Inference Efficiency
+
+The single hottest sub-field: closing the inference speed gap with autoregressive models.
+
+```
+Why does inference speed matter for DLMs?
+─────────────────────────────────────────
+  AR model:  generates 1 token per forward pass
+             → 512 tokens = 512 forward passes   (but fast per pass with KV cache)
+
+  Vanilla DLM: generates all tokens in T=1000 passes
+             → every pass processes the FULL sequence
+             → no KV cache (bidirectional attention)
+             → net result: SLOWER despite parallel tokens
+
+  The 2025–2026 papers below fix this with:
+    • KV caching adapted for block diffusion
+    • Early exit (skip steps when confident)
+    • AR-diffusion hybrid decoding
+    • Hierarchical caching
+```
+
+| Date | Paper | Key Innovation | Speedup | Links |
+|---|---|---|---|---|
+| **Aug 2025** | **Thinking Inside the Mask: In-Place CoT for dLLMs** | Embeds Chain-of-Thought reasoning steps directly into masked positions during denoising; no AR needed for reasoning | Quality ↑ | [arxiv:2508.10736](https://arxiv.org/abs/2508.10736) |
+| **Aug 2025** 🔥⭐ | **D2F: Discrete Diffusion Forcing** | Block-wise AR generation + KV cache + inter-block parallel decoding; distillation from pretrained dLLMs | **2.5× faster than LLaMA3** on GSM8K; **50× faster than vanilla LLaDA** | [arxiv:2508.09192](https://arxiv.org/abs/2508.09192) |
+| **Sep 2025** | **Fast-dLLM v2: Efficient Block-Diffusion LLM** | Converts AR models to dLLMs with only ~1B fine-tuning tokens (500× less than Dream); block diffusion + complementary attention mask + hierarchical KV cache | 500× less training data; competitive speed | [arxiv:2509.26328](https://arxiv.org/abs/2509.26328) |
+| **Mar 2026** | **ES-dLLM: Efficient Inference by Early-Skipping** | Skips denoising iterations for high-confidence positions; token-level early exit during the reverse process | Significant FLOPs reduction, minimal quality loss | [arxiv:2603.10088](https://arxiv.org/abs/2603.10088) |
+
+**Why this matters:**
+
+```
+Inference speed timeline (tokens/sec on comparable hardware)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  GPT-2 (AR, 2019)            ~100 tok/s
+  LLaDA 8B (vanilla, 2025)    ~30  tok/s   ← slower than AR!
+  Mercury Coder (Jun 2025)    ~600 tok/s   ← closes gap
+  Gemini Diffusion (May 2025) ~1479 tok/s  ← 5× faster than Flash Lite
+  D2F-LLaDA (Aug 2025)        ~250 tok/s   ← 2.5× vs LLaMA3
+```
+
+---
+
+### 🧠 Reasoning & RL Alignment
+
+How to make diffusion LLMs not just generate text, but *think* — via reinforcement learning and chain-of-thought.
+
+| Date | Paper | Method | Highlight |
+|---|---|---|---|
+| **Oct 2025** ⭐ | **DMPO: Distribution Matching Policy Optimization** (Zhu, Guo et al. — Georgia Tech) | Cross-entropy RL fine-tuning to match reward-tilted distribution; principled alternative to GRPO for dLLMs | First theoretically grounded RL method specifically designed for dLLMs; improves GSM8K, MATH | [arxiv:2510.08233](https://arxiv.org/abs/2510.08233) |
+| **Jul 2025** | **Unveiling the Potential of dLLMs in Controllable Generation** | Structured output via constrained sampling during denoising; mitigates hallucination in structured formats | Enables JSON, markdown, schema-constrained generation | [arxiv:2507.04504](https://arxiv.org/abs/2507.04504) |
+| **May 2026** 🆕 | **Focus on the Core: Self-Contrast** | Proactive selection of core reasoning tokens during denoising; contrasts local vs global context to avoid positional bias | SOTA on math benchmarks for open-source dLLMs | [arxiv:2605.01373](https://arxiv.org/abs/2605.01373) |
+
+**The RL problem is unique for dLLMs:**
+
+```
+AR model RL (GRPO/PPO):
+  → Generate sequence token by token
+  → Assign reward to final sequence
+  → Backprop through sequential generation    (well-studied)
+
+dLLM RL (open problem until 2025):
+  → Generate sequence via T denoising steps
+  → Which step do you assign the reward to?
+  → Gradient flows through a stochastic, multi-step process
+  → DMPO (2025) solves this via distribution matching
+```
+
+---
+
+### 📐 Theory & Scaling Laws
+
+Understanding *why* diffusion LMs work (and where they break) from first principles.
+
+| Date | Paper | Finding | Links |
+|---|---|---|---|
+| **Dec 2025** ⭐ | **Scaling Behavior of Discrete Diffusion LMs** (von Rütte et al.) | First systematic study of DLM scaling laws; **noise type critically changes scaling behavior**: uniform diffusion needs more params, less data; masked diffusion is compute-efficient at scale | [arxiv:2512.10858](https://arxiv.org/abs/2512.10858) |
+| **Dec 2025** | **On the Role of Discreteness in Diffusion LLMs** | Ablation study: flexible editing, compute-length decoupling, and data efficiency all emerge from *discreteness* itself, not just the diffusion process | [arxiv:2512.22630](https://arxiv.org/abs/2512.22630) |
+| **Dec 2025** 🔥 | **ReFusion: Parallel AR Decoding for Diffusion LLMs** (Li et al.) | Integrates sequence reorganization into causal attention; elevates parallel decoding from token level → *slot level*, enabling KV caching inside a masked diffusion framework | [arxiv:2512.13586](https://arxiv.org/abs/2512.13586) |
+| **Nov 2025** | **Diffusion LMs are Super Data Learners** (Ni, Liu et al.) | Scaling law discovery: DLMs have higher data utilization efficiency due to any-order modeling + Monte Carlo augmentation; advantage grows with repeated training epochs | [arxiv:2511.03276](https://arxiv.org/abs/2511.03276) |
+
+---
+
+### 🌍 Multimodal & Domain-Specific
+
+Diffusion LMs expanding beyond plain text generation.
+
+| Date | Paper | Domain | Key Idea |
+|---|---|---|---|
+| **Sep 2025** | **Beyond Autoregression: Empirical Study of dLLMs for Code** | Code generation | First systematic evaluation of DiffuCoder, Mercury, Seed Diffusion for code; shows non-sequential generation better mirrors how humans edit code | [arxiv:2509.11252](https://arxiv.org/abs/2509.11252) |
+| **Sep 2025** | **Masked Diffusion LMs with Frequency-Informed Training** | Low-resource NLP | Prioritizes learning from rare (low-frequency) tokens; competitive with AR baselines under strict 100M-token data limits (BabyLM 2025) | [arxiv:2509.05056](https://arxiv.org/abs/2509.05056) |
+| **Jul 2025** | **DIFFA: dLLMs Can Listen and Understand** | Audio-Language | First diffusion LLM for audio understanding; extends LLaDA's masked diffusion to audio-language tasks via a visual-audio pathway | [arxiv:2507.18452](https://arxiv.org/abs/2507.18452) |
+
+---
+
+### 📋 Surveys & Overviews (2025)
+
+The best papers to read *first* if you're trying to catch up on the entire DLM landscape.
+
+| Paper | Scope | Best For |
+|---|---|---|
+| **A Survey on Diffusion Language Models** (Li, Chen, Guo, Shen, 2025) | Comprehensive DLM taxonomy: discrete vs continuous, training objectives, sampling strategies, applications, open problems | Researchers needing a structured map of the field | [arxiv:2508.10875](https://arxiv.org/abs/2508.10875) |
+| **dLLM: Simple Diffusion Language Modeling** (2026) | Distilled best practices from 2024–2025 DLM research into a clean, reproducible framework | Practitioners building their own DLM | [arxiv:2602.22661](https://arxiv.org/abs/2602.22661) |
+
+---
+
+### 📅 Chronological Timeline
+
+```
+MAY 2025
+  └─ May 20  Gemini Diffusion announced (Google DeepMind) ← industry enters the field
+  └─ May 24  Anchored DLM — masking strategy fix (2505.18456)
+
+JUN 2025
+  └─ Jun 17  Mercury Coder — commercial diffusion LLM for code (2506.17298)
+
+JUL 2025
+  └─ Jul ??  Controllable Generation for dLLMs (2507.04504)
+  └─ Jul ??  DIFFA — audio-language dLLM (2507.18452)
+
+AUG 2025
+  └─ Aug ??  Thinking Inside the Mask — in-place CoT (2508.10736)
+  └─ Aug ??  D2F — 2.5× faster-than-AR inference (2508.09192)
+  └─ Aug ??  Dream 7B — Qwen-adapted dLLM (2508.15487)
+  └─ Aug ??  Survey on Diffusion LMs (2508.10875)
+
+SEP 2025
+  └─ Sep 14  dLLMs for Code — empirical study (2509.11252)
+  └─ Sep ??  Frequency-Informed Masked DLM (2509.05056)
+  └─ Sep 30  Fast-dLLM v2 — efficient block diffusion (2509.26328)
+
+OCT 2025
+  └─ Oct ??  DMPO — RL fine-tuning for dLLMs (2510.08233)
+
+NOV 2025
+  └─ Nov  5  Super Data Learners — DLM vs AR scaling (2511.03276) ← #1 paper of day
+
+DEC 2025
+  └─ Dec 11  Scaling Laws for Discrete Diffusion (2512.10858)
+  └─ Dec 15  ReFusion — parallel AR + diffusion (2512.13586)
+  └─ Dec ??  On the Role of Discreteness (2512.22630)
+  └─ Dec ??  LLaDA 2.0 — 100B parameter dLLM (2512.15745)
+
+FEB 2026
+  └─ Feb ??  dLLM: Simple Diffusion LM — best practices (2602.22661)
+
+MAR 2026
+  └─ Mar ??  ES-dLLM — early-skipping for inference (2603.10088)
+
+MAY 2026
+  └─ May ??  Self-Contrast for dLLMs — core token selection (2605.01373)
+```
+
+> 💡 **Notice the pattern:** May–Aug 2025 = speed & scalability breakthroughs. Sep–Dec 2025 = reasoning, RL, and theory. 2026 = simplification, efficiency, and new domains.
 
 ---
 
