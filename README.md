@@ -24,17 +24,15 @@
 <br/>
 
 
-<p align="center">
-  <a href="md_src/Screen Recording 2026-05-12 022805.mp4">
-    <img src="assets/demo-preview.gif" width="800" alt="Watch Demo"/>
-  </a>
-</p>
-
-
-
 </div>
 
 ---
+
+<p align="center">
+  <a href="md_src/Screen Recording 2026-05-12 022805.mp4">
+  </a>
+</p>
+
 
 ## 📌 Table of Contents
 
