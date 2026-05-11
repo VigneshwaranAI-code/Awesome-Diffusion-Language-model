@@ -32,7 +32,7 @@
 ## 🎥 Visual Walkthrough
 
 <p align="center">
-  <a href="./md_src/Screen Recording 2026-05-12 022805.mp4">
+  <a href="md_src/Screen Recording 2026-05-12 022805.mp4">
     <img src="./assets/demo-preview.gif" width="900" alt="Watch the walkthrough"/>
   </a>
 </p>
