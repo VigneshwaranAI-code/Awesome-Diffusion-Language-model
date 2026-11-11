@@ -500,6 +500,7 @@ Understanding *why* diffusion LMs work (and where they break) from first princip
 | **Dec 2025** | **On the Role of Discreteness in Diffusion LLMs** | Ablation study: flexible editing, compute-length decoupling, and data efficiency all emerge from *discreteness* itself, not just the diffusion process | [arxiv:2512.22630](https://arxiv.org/abs/2512.22630) |
 | **Dec 2025** 🔥 | **ReFusion: Parallel AR Decoding for Diffusion LLMs** (Li et al.) | Integrates sequence reorganization into causal attention; elevates parallel decoding from token level → *slot level*, enabling KV caching inside a masked diffusion framework | [arxiv:2512.13586](https://arxiv.org/abs/2512.13586) |
 | **Nov 2025** | **Diffusion LMs are Super Data Learners** (Ni, Liu et al.) | Scaling law discovery: DLMs have higher data utilization efficiency due to any-order modeling + Monte Carlo augmentation; advantage grows with repeated training epochs | [arxiv:2511.03276](https://arxiv.org/abs/2511.03276) |
+| **Aug 2025** | **Empirical Analysis of Decoding Biases in Masked Diffusion Models** | Identifies boundary and trivial-token biases in uncertainty-based masked diffusion decoding; calibrates decoding using positional trajectories and token informativeness | [arxiv:2508.13021](https://arxiv.org/abs/2508.13021) |
 
 ---
 
